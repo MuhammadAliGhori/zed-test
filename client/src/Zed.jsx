@@ -13,6 +13,7 @@ export default () => {
     architecture: "",
     profession: "",
     agreeToTerms: false,
+    file: null,
   });
 
   const handleInputChange = (e) => {
@@ -23,6 +24,11 @@ export default () => {
       setFormData({
         ...formData,
         [name]: val,
+      });
+    } else if (name === "file") {
+      setFormData({
+        ...formData,
+        file: e.target.files,
       });
     } else {
       setFormData({
@@ -35,20 +41,27 @@ export default () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form Data: Ali", formData);
+    const formDataToSend = new FormData();
+  
     for (const key in formData) {
-      if (!formData[key]) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `Please fill in the ${key} field.`,
-        });
-        return;
+      if (key === 'file') {
+        for (let i = 0; i < formData[key].length; i++) {
+          formDataToSend.append('file', formData[key][i]);
+        }
+      } else {
+        formDataToSend.append(key, formData[key]);
       }
     }
+  
     try {
       const response = await axios.post(
         "http://localhost:8000/api/createdata",
-        formData
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       console.log("Data created:", response.data);
       setFormData({
@@ -58,6 +71,7 @@ export default () => {
         architecture: "",
         profession: "",
         agreeToTerms: false,
+        file: null, 
       });
       navigate("/allcards");
     } catch (error) {
@@ -122,6 +136,22 @@ export default () => {
             value={formData.name}
             onChange={handleInputChange}
           />
+
+          <div className="mb-3 w-45 px-2 d-flex flex-column">
+            <label htmlFor="file" className="form-label">
+              <h4 className="user-name bold d-flex justify-content-start w-100 mb-0 ">
+                File Upload:
+              </h4>
+            </label>
+            <input
+              type="file"
+              name="file"
+              id="file"
+              onChange={handleInputChange}
+              className="form-control"
+              checked={formData.file}
+            />
+          </div>
           <div className="d-flex flex-wrap justify-content-between">
             {allSelectors.map((selector, index) => (
               <div key={index} className="mb-3 w-45 px-2 d-flex flex-column">

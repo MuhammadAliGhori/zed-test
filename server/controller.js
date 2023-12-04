@@ -1,22 +1,51 @@
 // updatedController.js
 const UpdatedData = require("./model");
+const multer = require("multer");
+
+// upload middleware
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "--" + file.originalname);
+  },
+});
+const upload = multer({ storage: fileStorage }).array("file", 10);
 
 // create data
 exports.storeData = async (req, res) => {
   try {
-    const { name, age, gender, architecture, profession, agreeToTerms } =
-      req.body;
-    const newData = new UpdatedData({
-      name,
-      age,
-      gender,
-      architecture,
-      profession,
-      agreeToTerms,
+    upload(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ message: err.message });
+      } else if (err) {
+        return res.status(500).json({ message: err.message });
+      }
+
+      const { name, age, gender, architecture, profession, agreeToTerms } =
+        req.body;
+
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: "Please upload a file" });
+      }
+
+      const filePaths = req.files.map((file) => file.path);
+
+      const newData = new UpdatedData({
+        name,
+        age,
+        gender,
+        architecture,
+        profession,
+        agreeToTerms,
+        file: filePaths,
+      });
+
+      await newData.save();
+      console.log(newData, "data");
+      res.status(201).json(newData);
     });
-    await newData.save();
-    console.log(newData, 'data');
-    res.status(201).json(newData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

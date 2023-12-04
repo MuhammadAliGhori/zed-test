@@ -7,15 +7,16 @@ const updatedRoutes = require("./routes");
 const app = express();
 const PORT = 8000;
 
+const path = require('path');
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+
+
+
 // Middlewares
 app.use(cors());
 app.use(bodyParser.json());
-
-app.use(cors({
-  origin: 'https://zed-frontend.vercel.app', 
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  optionsSuccessStatus: 204
-}));
 
 // Routes
 app.use("/api", updatedRoutes);
@@ -36,5 +37,3 @@ const start = async () => {
 };
 
 start();
-
-module.exports = app;

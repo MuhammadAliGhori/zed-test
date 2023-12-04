@@ -17,7 +17,7 @@ export default function ZedCards() {
     agreeToTerms: false,
   });
   const [show, setShow] = useState(false);
-
+  const bkURL = "http://localhost:8000/";
   const handleClose = () => {
     setShow(false);
   };
@@ -26,7 +26,7 @@ export default function ZedCards() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://zed4.vercel.app/api/getdata");
+        const response = await axios.get("http://localhost:8000/api/getdata");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -40,7 +40,7 @@ export default function ZedCards() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://zed4.vercel.app/api/deletedata/${id}`);
+      await axios.delete(`http://localhost:8000/api/deletedata/${id}`);
       setData(data.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Error deleting data:", error);
@@ -88,6 +88,7 @@ export default function ZedCards() {
               style={{ width: "18rem" }}
               className="card item-card card-block p-2"
             >
+              {console.log(item, "ali")}
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center">
                   <Card.Title className="item-card-title">Name : </Card.Title>
@@ -95,6 +96,13 @@ export default function ZedCards() {
                     {item.name}
                   </Card.Title>
                 </div>
+                {item.file.length > 0 && (
+                  <img
+                    className="object-fit-cover w-100"
+                    src={bkURL + item.file[0]}
+                    alt=""
+                  />
+                )}
 
                 <div className="d-flex justify-content-between align-items-center">
                   <Card.Text className="card-text mb-0">Age:</Card.Text>

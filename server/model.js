@@ -6,6 +6,10 @@ const updatedSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  file: {
+    type: [String],
+    required: true,
+  },
   age: {
     type: String,
     required: true,
